@@ -3,19 +3,6 @@
 #define TRUE 0 == 0
 #define FALSE !TRUE
 
-// //----------------------------------------------------------------------
-// // Variables Globales. 
-//----------------------------------------------------------------------
-
-// extern int modalidad; // 1 := Interactiva || 2 := Automatica
-// extern int nCarritos;
-// extern long maxProductos;
-// extern long maxPesoBanda;
-// extern float velCajera;
-// extern float velEmbolsador;
-// extern long tFacturacion;
-// extern long maxPesoAreaEmbolsado;
-// extern long maxPesoBolsa;
 
 //----------------------------------------------------------------------
 // Estructuras
