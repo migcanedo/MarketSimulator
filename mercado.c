@@ -1,6 +1,5 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <wchar.h>
 #include "mercado.h"
 
 int modalidad = 1; // 1 := Interactiva || 2 := Automatica
