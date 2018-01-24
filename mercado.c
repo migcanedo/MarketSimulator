@@ -1,6 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
+#include <wchar.h>
 #include "mercado.h"
 
 int modalidad = 1; // 1 := Interactiva || 2 := Automatica
@@ -22,11 +22,7 @@ int main(int argc, char* argv[]){
 	
 	LinkedList * inventario = crearInventario(argv[1]);
 
-	Producto *p = inventario->head;
-	while(p != NULL){
-		printf("%s\n", p->nombre);
-		p = p->next;
-	}
+	imprimirLista(inventario);
 
 	printf("\nBienvenido al MarketSimulator!\n");
 	while (TRUE){
@@ -45,6 +41,8 @@ int main(int argc, char* argv[]){
 			default: printf("\nOpcion Invalida. Elija una opcion valida del menu.\n"); 
 		}
 	}
+
+	eliminarLista(inventario);
 }
 
 
@@ -60,37 +58,15 @@ LinkedList *crearInventario(char *archivo){
 		exit(0);
 	}
 
-	LinkedList *inventario = (LinkedList*) malloc(sizeof(LinkedList));
+	LinkedList *inventario = crearLista();
 
 	Producto *pp = (Producto*) malloc(sizeof(Producto));
 
-	while (fscanf(fp, "%[^\t]\t%d\t%f", pp->nombre, &(pp->peso), &(pp->complejidad)) == 3){
-        agregarLista(inventario, pp);
+	while (fscanf(fp, "%[^\t]\t%d\t%f\n", pp->nombre, &(pp->peso), &(pp->complejidad)) == 3){
+        agregarElem(inventario, pp);
         pp = (Producto*) malloc(sizeof(Producto));
 	}
 
     fclose(fp);
     return inventario;
-}
-
-/*
-Funcion que se encarga de agregar un Producto 'p' a la Lista Enlazada 'l'.
-*/
-void agregarLista (LinkedList *l, Producto *p){
-	if (!(l->head) || l->head->peso > p->peso){
-		
-		p->next = l->head;
-		l->head = p;
-
-	}else{
-		
-		Producto *ite = l->head;
-		
-		while (ite->next && ite->next->peso < p->peso)
-				ite = ite->next;		
-		
-		p->next = ite->next;
-		ite->next = p;
-	}
-	l->cant += 1;
 }
