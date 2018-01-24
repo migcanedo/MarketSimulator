@@ -1,0 +1,8 @@
+Lijadora	50	4
+Martillo	150	5
+Sierra	150	4
+Podadora	1500	12
+Sierra eléctrica	500	6
+Destornillador	200	2
+Porra	500	10
+Llave inglesa	150	3
