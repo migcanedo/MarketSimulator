@@ -36,18 +36,34 @@ typedef struct LinkedList
 
 }LinkedList;
 
+/* 
+Estructura que se comportara como una Pila trabajando con una lista enlazada,
+donde se guardara la direccion del primer producto conforme se van agregando.
 
-/* Area de Embolsado */
+Para funciones de la simulacion del mercado, esta estructura servira para
+simular el area de embolsado. Empilando los productos procesados por la cajera.
+*/
 typedef struct Pila
-{
+{	
+	Producto *head;
+	int cant;
 	
 }Pila;
 
-/* Banda */
+/* 
+Estructura que se comportara como una COla trabajando con una lista enlazada,
+donde se guardara la direccion tanto del primer como del ultimo elemento agregado.
+
+Para funciones de la simulacion del mercado, esta estructura servira para 
+simular la Banda. Agregando los productos que salen del carro y sacando los procesados.
+*/
 typedef struct Cola
 {
+	Producto *head, *tail;
+	int cant;
 
 }Cola;
+
 
 //----------------------------------------------------------------------
 // Funciones.
@@ -88,4 +104,42 @@ productos del mismo.
 */
 LinkedList * crearInventario(char *);
 
+/*
+Funcion que se encarga de agregar un Producto 'p' a la Pila 's'.
+*/
+void agregarPila (Pila *, Producto *);
 
+//ESTA FUNCION SE EBORRARA
+Pila * crearPila();
+
+/*
+Funcion que se encarga de eliminar el primer Producto 'p' de la Pila 's', quien
+seria la cabeza de la pila, y lo retorna.
+*/
+Producto *quitarPila (Pila *);
+
+/*
+Funcion que se encarga de imprimir los nombres de los Productos que se estan almacenando
+en la Pila 's'.
+*/
+void imprimirPila (Pila *);
+
+/*
+Funcion que se encarga de agregar un Producto 'p' a la Cola 'c'.
+*/
+void agregarCola (Cola *, Producto *);
+
+//ESTA FUNCION SE BORRARA
+Cola * crearCola ();
+
+/*
+Funcion que se encarga de eliminar el primer Producto 'p' introducido en la Cola 'c', quien
+seria la cola de la Cola, y lo retorna.
+*/
+Producto *quitarCola (Cola *);
+
+/*
+Funcion que se encarga de imprimir los nombres de los Productos que se estan almacenando
+en la Cola 'c'.
+*/
+void imprimirCola(Cola *);
