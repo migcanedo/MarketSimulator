@@ -7,7 +7,6 @@
 //----------------------------------------------------------------------
 // Estructuras
 //----------------------------------------------------------------------
-
 /*
 Estructura que se comportara como un Nodo de diferentes estructuras de 
 almacenamiento. En ella se guardara el nombre, peso y complejidad de
@@ -19,8 +18,22 @@ typedef struct Producto
 	char nombre[100];
 	int peso;
 	float complejidad;
-	struct Producto * next;
 } Producto;
+
+
+/*
+Estructura qeu se comportara como un Nodo para las diferentes estructuras 
+de Almacenamiento. En ella se guardaran el apuntador al Producto que se esta
+almacenando en el Nodo, el apuntador hacia el Nodo que le sigue al mismo en la 
+estructura de almacenamiento y un apuntador hacia la estructura Nodo previa.
+*/
+typedef struct Nodo
+{
+	Producto * prod;
+	struct Nodo * next;
+	struct Nodo * prev;
+}Nodo;
+
 
 /* 
 Estructura que se comportara como una Lista Enlazada, donde se guarda la 
@@ -31,7 +44,7 @@ simular al Carro. Ordenando sus productos segun su peso, de menor a mayor.
  */
 typedef struct LinkedList
 {
-	Producto *head;
+	Nodo *head;
 	int cant;
 
 }LinkedList;
@@ -45,7 +58,7 @@ simular el area de embolsado. Empilando los productos procesados por la cajera.
 */
 typedef struct Pila
 {	
-	Producto *head;
+	Nodo *head;
 	int cant;
 	
 }Pila;
@@ -59,7 +72,7 @@ simular la Banda. Agregando los productos que salen del carro y sacando los proc
 */
 typedef struct Cola
 {
-	Producto *head, *tail;
+	Nodo *head, *tail;
 	int cant;
 
 }Cola;
@@ -103,6 +116,12 @@ Funcion que dado el nombre del archivo donde se encuentra el inventario, crea un
 productos del mismo.
 */
 LinkedList * crearInventario(char *);
+
+/*
+Funcion que imprime en pantalla y gestiona el menu de Cambio de configuracion del MarketSimulator.
+*/
+void menuConfiguracion();
+
 
 /*
 Funcion que se encarga de agregar un Producto 'p' a la Pila 's'.
