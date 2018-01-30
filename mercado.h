@@ -118,6 +118,11 @@ productos del mismo.
 LinkedList * crearInventario(char *);
 
 /*
+
+*/
+void simulacion(LinkedList *);
+
+/*
 Funcion que imprime en pantalla y gestiona el menu de Cambio de configuracion del MarketSimulator.
 */
 void menuConfiguracion();

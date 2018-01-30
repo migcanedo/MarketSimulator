@@ -10,6 +10,8 @@ void agregarElem (LinkedList *l, Producto *p){
 	Nodo *n = (Nodo*) malloc(sizeof(Nodo));
 	n->prod = p;
 
+	// printf("%s\n", p->nombre);
+
 	if (!(l->head) || l->head->prod->peso > p->peso){	
 		n->next = l->head;
 		l->head = n;
@@ -46,6 +48,8 @@ un apuntador a ese espacio.
 */
 LinkedList * crearLista(){
 	LinkedList *nueva = (LinkedList*) malloc(sizeof(LinkedList));
+	nueva->head = NULL;
+	nueva->cant = 0; 
 
 	return nueva;
 }

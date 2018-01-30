@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <time.h>
 #include "mercado.h"
 #define true 1
 #define false 0
@@ -19,7 +20,6 @@ int maxPesoBolsa = 120;
 int main(int argc, char* argv[]){
 	int opc;
 	
-
 	if (argc < 2){
 		printf("\nError. Debe indicar el nombre del archivo donde se encuentra el Inventario.\n\n");
 		exit(1);
@@ -27,7 +27,6 @@ int main(int argc, char* argv[]){
 	
 	LinkedList * inventario = crearInventario(argv[1]);
 
-	imprimirLista(inventario);
 
 	printf("\nBienvenido al MarketSimulator!\n");
 	while (TRUE){
@@ -42,7 +41,9 @@ int main(int argc, char* argv[]){
 		scanf("%d", &opc);
 		getchar();
 		switch (opc){
-			case 1: break;
+			case 1: 
+				simulacion(inventario);
+				break;
 			case 2: 
 				menuConfiguracion();
 				break;
@@ -79,6 +80,46 @@ LinkedList *crearInventario(char *archivo){
     fclose(fp);
     return inventario;
 }
+
+/*
+
+*/
+void simulacion(LinkedList *inventario){
+	srand(time(NULL));
+	
+	// Crear los carritos.
+	LinkedList * carritos[nCarritos];
+
+	int i, j, cantProd, p, ite;
+	for(i = 0; i < nCarritos; i++){
+		carritos[i] = crearLista();
+		cantProd = rand() % maxProductos + 1;
+		printf("-----------------------\n" );
+		for(j = 0; j < cantProd; j++){
+			p = rand() % (inventario->cant);
+			ite = 0;
+			Nodo * n = inventario->head;
+			while (ite < p){
+				n = n->next;
+				ite += 1;
+			}
+			agregarElem(carritos[i], n->prod);
+		}
+
+		imprimirLista(carritos[i]);
+	}
+
+	// Pasar productos del carrito a la Banda.
+
+	// Procesar productos de la Banda.
+
+	// Pasar productos procesados al Area de Embolsado.
+
+	// Meter en bolsa productos del Area de Embolsado.
+}
+
+
+
 
 /*
 Funcion que imprime en pantalla y gestiona el menu de Cambio de configuracion del MarketSimulator.
