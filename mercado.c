@@ -87,11 +87,12 @@ void menuConfiguracion(){
 	int opc2;
 	char opc3;
 	int aux;
+	float aux1;
 	bool config = true;
 
 	while (config){
 		printf("\n-----------------------------------------------\n");
-		printf("Menu de configuracion:\n");
+		printf("Menu de Configuracion:\n");
 		printf("\nQue desea hacer?\n\n");
 		printf("\t1. Cambiar la modalidad.\n");
 		printf("\t2. Cambiar la cantidad de carritos en la cola.\n");
@@ -121,7 +122,7 @@ void menuConfiguracion(){
 						printf("\nModalidad cambiada exitosamente a: \"%s\"\n", (modalidad ? "Interactiva" : "Automatica"));
 					}
 					break;
-			case 2: printf("\nLa cantidad actual de carritos en la cola es: \"%d\"\n", nCarritos);
+			case 2: printf("\nLa cantidad actual de Ccarritos en la cola es: \"%d\"\n", nCarritos);
 					printf("Desea cambiarla? (y: Si/otro: No)  ");
 
 					scanf("%c", &opc3);
@@ -129,7 +130,7 @@ void menuConfiguracion(){
 
 					if (opc3 == 'y') {
 						aux = nCarritos;
-						printf("Indique la nueva cantidad de carritos que habra en la cola: ");
+						printf("Indique la nueva cantidad de Carritos que habra en la cola: ");
 						scanf("%d", &nCarritos);
 						getchar();
 						
@@ -137,7 +138,7 @@ void menuConfiguracion(){
 																												aux, nCarritos);
 					}
 					break;
-			case 3: printf("\nLa cantidad actual maxima de productos por carrito es: \"%d\"\n", maxProductos);
+			case 3: printf("\nLa cantidad actual maxima de Productos por Carrito es: \"%d\"\n", maxProductos);
 					printf("Desea cambiarla? (y: Si/otro: No)  ");
 
 					scanf("%c", &opc3);
@@ -145,7 +146,7 @@ void menuConfiguracion(){
 
 					if (opc3 == 'y') {
 						aux = maxProductos;
-						printf("Indique la nueva cantidad maxima de prodcutos por carrito: ");
+						printf("Indique la nueva cantidad maxima de Productos por Carrito: ");
 						scanf("%d", &maxProductos);
 						getchar();
 						
@@ -153,7 +154,7 @@ void menuConfiguracion(){
 																												aux, maxProductos);
 					}
 					break;
-			case 4: printf("\nLa capacidad maxima actual de la Banda es: \"%d\"\n", maxPesoBanda);
+			case 4: printf("\nLa capacidad maxima actual de la Banda es: \"%dcc\"\n", maxPesoBanda);
 					printf("Desea cambiarla? (y: Si/otro: No)  ");
 
 					scanf("%c", &opc3);
@@ -165,17 +166,59 @@ void menuConfiguracion(){
 						scanf("%d", &maxPesoBanda);
 						getchar();
 						
-						printf("\nLa capacidad maxima de la Banda se ha cambiado exitosamente de: \"%d\" a: \"%d\"\n", 
+						printf("\nLa capacidad maxima de la Banda se ha cambiado exitosamente de: \"%dcc\" a: \"%dcc\"\n", 
 																												aux, maxPesoBanda);
 					}
 					break;
-			case 5: 
+			case 5: printf("\nLa cantidad actual de Operaciones por Segundo que realiza la Cajera es: \"%f\"\n", velCajera);
+					printf("Desea cambiarla? (y: Si/otro: No)  ");
+
+					scanf("%c", &opc3);
+					getchar();
+
+					if (opc3 == 'y') {
+						aux1 = velCajera;
+						printf("Indique la nueva cantidad de Operaciones por Segundo que realizara la Cajera: ");
+						scanf("%f", &velCajera);
+						getchar();
+						
+						printf("\nLa cantidad de Operaciones por Segundo que realiza la Cajera se ha cambiado exitosamente de: \"%f\" a: \"%f\"\n", 
+																												aux1, velCajera);
+					}
 					break;
-			case 6: 
+			case 6: printf("\nLa cantidad actual de Segundos por Bolsa que require el Embolsador es: \"%f\"\n", velEmbolsador);
+					printf("Desea cambiarla? (y: Si/otro: No)  ");
+
+					scanf("%c", &opc3);
+					getchar();
+
+					if (opc3 == 'y') {
+						aux1 = velEmbolsador;
+						printf("Indique la nueva cantidad de Segundos por Bolsa que requiere el Embolsador: ");
+						scanf("%f", &velEmbolsador);
+						getchar();
+						
+						printf("\nLa cantidad de Segundos por Bolsa que requiere el Embolsador se ha cambiado exitosamente de: \"%f\" a: \"%f\"\n", 
+																												aux1, velEmbolsador);
+					}
 					break;
-			case 7: 
+			case 7: printf("\nEl tiempo actual de Facturacion es: \"%ds\"\n", tFacturacion);
+					printf("Desea cambiarla? (y: Si/otro: No)  ");
+
+					scanf("%c", &opc3);
+					getchar();
+
+					if (opc3 == 'y') {
+						aux = tFacturacion;
+						printf("Indique el nuevo tiempo de Facturacion: ");
+						scanf("%d", &tFacturacion);
+						getchar();
+						
+						printf("\nEl tiempo de Facturacion se ha cambiado exitosamente de: \"%ds\" a: \"%ds\"\n", 
+																												aux, tFacturacion);
+					}
 					break;
-			case 8: printf("\nLa capacidad maxima actual del Area de Embolsado es: \"%d\"\n", maxPesoAreaEmbolsado);
+			case 8: printf("\nLa capacidad maxima actual del Area de Embolsado es: \"%dcc\"\n", maxPesoAreaEmbolsado);
 					printf("Desea cambiarla? (y: Si/otro: No)  ");
 
 					scanf("%c", &opc3);
@@ -187,11 +230,11 @@ void menuConfiguracion(){
 						scanf("%d", &maxPesoAreaEmbolsado);
 						getchar();
 						
-						printf("\nLa capacidad maxima del Area de Embolsado se ha cambiado exitosamente de: \"%d\" a: \"%d\"\n", 
+						printf("\nLa capacidad maxima del Area de Embolsado se ha cambiado exitosamente de: \"%dcc\" a: \"%dcc\"\n", 
 																												aux, maxPesoAreaEmbolsado);
 					}
 					break;
-			case 9: printf("\nLa capacidad maxima actual de las Bolsas es: \"%d\"\n", maxPesoBolsa);
+			case 9: printf("\nLa capacidad maxima actual de las Bolsas es: \"%dcc\"\n", maxPesoBolsa);
 					printf("Desea cambiarla? (y: Si/otro: No)  ");
 
 					scanf("%c", &opc3);
@@ -203,7 +246,7 @@ void menuConfiguracion(){
 						scanf("%d", &maxPesoBolsa);
 						getchar();
 						
-						printf("\nLa capacidad maxima de las Bolsas se ha cambiado exitosamente de: \"%d\" a: \"%d\"\n", 
+						printf("\nLa capacidad maxima de las Bolsas se ha cambiado exitosamente de: \"%dcc\" a: \"%dcc\"\n", 
 																												aux, maxPesoBolsa);
 					}
 					break;
