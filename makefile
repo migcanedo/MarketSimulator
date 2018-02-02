@@ -7,7 +7,7 @@ mercado: mercado.o $(Structures)
 mercado.o: mercado.c mercado.h
 	$(CC) -c mercado.c
 
-LinkedList.o: LikedList.c mercado.h
+LinkedList.o: LinkedList.c mercado.h
 	$(CC) -c LinkedList.c
 
 Pila.o: Pila.c mercado.h
