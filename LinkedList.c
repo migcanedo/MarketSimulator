@@ -7,20 +7,24 @@
 Funcion que se encarga de agregar un Producto 'p' a la Lista Enlazada 'l'.
 */
 void agregarElem (LinkedList *l, Producto *p){
-	if (!(l->head) || l->head->peso > p->peso){
-		
-		p->next = l->head;
-		l->head = p;
+	Nodo *n = (Nodo*) malloc(sizeof(Nodo));
+	n->prod = p;
+
+	// printf("%s\n", p->nombre);
+
+	if (!(l->head) || l->head->prod->peso > p->peso){	
+		n->next = l->head;
+		l->head = n;
 
 	}else{
 		
-		Producto *ite = l->head;
+		Nodo *ite = l->head;
 		
-		while (ite->next && ite->next->peso < p->peso)
+		while (ite->next && ite->next->prod->peso < p->peso)
 				ite = ite->next;		
 		
-		p->next = ite->next;
-		ite->next = p;
+		n->next = ite->next;
+		ite->next = n;
 	}
 	l->cant += 1;
 }
@@ -30,11 +34,12 @@ Funcion que se encarga de eliminar el primer Producto 'p' de la Lista Enlazada '
 seria la cabeza de la lista, y lo retorna. En caso de que la lista este vacia, retornara NULL.
 */
 Producto *eliminarElem(LinkedList *l){
-	Producto *aux = l->head;
+	Nodo *aux = l->head;
 	if(aux)
 		l->head = l->head->next;
 
-	return aux;
+	free(aux);
+	return aux->prod;
 }
 
 /*
@@ -43,6 +48,8 @@ un apuntador a ese espacio.
 */
 LinkedList * crearLista(){
 	LinkedList *nueva = (LinkedList*) malloc(sizeof(LinkedList));
+	nueva->head = NULL;
+	nueva->cant = 0; 
 
 	return nueva;
 }
@@ -52,9 +59,9 @@ Funcion que se encarga de imprimir los nombres de los Productos que se estan alm
 en la Lista Enlazada 'l'.
 */
 void imprimirLista(LinkedList *l){
-	Producto *p = l->head;
+	Nodo *p = l->head;
 	while(p){
-		printf("%s\n", p->nombre);
+		printf("%s\n", p->prod->nombre);
 		p = p->next;
 	}
 }
@@ -64,8 +71,8 @@ Funcion que se encarga de imprimir los nombres de los Productos que se estan alm
 en la Lista Enlazada 'l'.
 */
 void eliminarLista(LinkedList *l){
-	Producto *p = l->head;
-	Producto *aux;
+	Nodo *p = l->head;
+	Nodo *aux;
 	while(p){
 		aux = p->next;
 		free(p);
