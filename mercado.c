@@ -193,6 +193,9 @@ void simulacion(LinkedList *inventario){
 		imprimirDatos(carritos[i], banda, areaEmb);
 		++operacion;
 		int t = 0;
+		
+		printf("Presione enter para pasar al siguiente instante...");
+		while(getchar() != '\n');
 
 		//ciclo en el que cada iteracion representa un instante de tiempo (como si el enter fuera presionado automaticamente)
 		while(!facturado){
@@ -228,6 +231,8 @@ void simulacion(LinkedList *inventario){
 			++operacion;
 			imprimirDatos(carritos[i], banda, areaEmb);
 			++t;
+			printf("Presione enter para pasar al siguiente instante...");
+			while(getchar() != '\n');
 		}
 		//termina de procesar a un cliente y reinicia todas las variables
 		tCliente = operacion - 1 + tFacturacion;
@@ -236,6 +241,9 @@ void simulacion(LinkedList *inventario){
 		facturado = FALSE;
 		vaciarPila(areaEmb);
 
+		// Elimina los carritos luego de q hayas acabados con ellos, asi liberaras espacio en memoria.
+		// Lo mismo con la Pila y la Cola al acabar el programa.
+		// Por lo que veo todo esta bien, agrege lo de perdir el enter.
 	}
 	/**
 	pesoBanda = maxPesoBanda;
@@ -283,15 +291,6 @@ void simulacion(LinkedList *inventario){
 	printf("CLiente numero %d tardo %d en ser facturado\n", 0, tCliente);
 	operacion = 0;
 	**/
-
-	// Pasar productos del carrito a la Banda.
-
-
-	// Procesar productos de la Banda.
-
-	// Pasar productos procesados al Area de Embolsado.
-
-	// Meter en bolsa productos del Area de Embolsado.
 }
 
 
