@@ -9,17 +9,24 @@
 typedef int bool;
 int modalidad = 1; // 1 := Interactiva || 2 := Automatica
 int nCarritos = 3;
-int maxProductos = 30;
-int maxPesoBanda = 200;
+int maxProductos = 5;
+int maxPesoBanda = 240;
 float velCajera = 1.0;
 float velEmbolsador = 4;
 int tFacturacion = 130;
 int maxPesoAreaEmbolsado = 150;
 int maxPesoBolsa = 120;
 
+int tCliente = 0;
+float complejidadAct = 0;
+int pesoBanda;
+int facturado = FALSE;
+int operacion = 0;
+Producto *prodBanda;
+Producto *prodPila;
+
 int main(int argc, char* argv[]){
 	int opc;
-	
 	if (argc < 2){
 		printf("\nError. Debe indicar el nombre del archivo donde se encuentra el Inventario.\n\n");
 		exit(1);
@@ -89,12 +96,77 @@ void simulacion(LinkedList *inventario){
 	
 	// Crear los carritos.
 	LinkedList * carritos[nCarritos];
+	Cola * banda = crearCola();
+	Pila * areaEmb = crearPila();
 
+	/**
+	int p, ite;
+	carritos[0] = crearLista();
+	ite = 0;
+	Nodo * n = inventario->head;
+	p = 12;
+	while (ite < p){
+		n = n->next;
+		ite += 1;
+	}
+	agregarElem(carritos[0], n->prod);
+
+	ite = 0;
+	n = inventario->head;
+	p = 17;
+	while (ite < p){
+		n = n->next;
+		ite += 1;
+	}
+	agregarElem(carritos[0], n->prod);
+
+	ite = 0;
+	n = inventario->head;
+	p = 16;
+	while (ite < p){
+		n = n->next;
+		ite += 1;
+	}
+	agregarElem(carritos[0], n->prod);
+
+	ite = 0;
+	n = inventario->head;
+	p = 23;
+	while (ite < p){
+		n = n->next;
+		ite += 1;
+	}
+	agregarElem(carritos[0], n->prod);
+
+	imprimirDatos(carritos[0], banda, areaEmb);
+	printf("%d%d\n", carritos[0]->cant, banda->cant);
+	**/
+	/**
+	while(carritos[0]->cant >0){
+		prodBanda = eliminarElem(carritos[0]);
+		agregarCola(banda, prodBanda);
+		imprimirDatos(carritos[0], banda, areaEmb);
+	}
+	while(banda->cant > 0){
+		prodPila = quitarCola(banda);
+		agregarPila(areaEmb ,prodPila);
+		imprimirDatos(carritos[0], banda, areaEmb);
+	}**/
+	/**
+	while(carritos[0]->cant > 0){
+		prodBanda = eliminarElem(carritos[0]);
+		agregarCola(banda, prodBanda);
+		prodPila = quitarCola(banda);
+		agregarPila(areaEmb ,prodPila);
+		imprimirDatos(carritos[0], banda, areaEmb);
+	}**/
+
+	printf("\n====CARRITOS==CREADOS====\n");
 	int i, j, cantProd, p, ite;
 	for(i = 0; i < nCarritos; i++){
 		carritos[i] = crearLista();
 		cantProd = rand() % maxProductos + 1;
-		printf("-----------------------\n" );
+		//printf("-----------------------\n" );
 		for(j = 0; j < cantProd; j++){
 			p = rand() % (inventario->cant);
 			ite = 0;
@@ -105,11 +177,115 @@ void simulacion(LinkedList *inventario){
 			}
 			agregarElem(carritos[i], n->prod);
 		}
-
+		printf("\n======CARRITO==%d======\n", i);
 		imprimirLista(carritos[i]);
 	}
 
+	//Ciclo que procesa a los clientes uno a uno (se empieza a procesar despues de que el cliente acterior haya sido facturado)
+	pesoBanda = maxPesoBanda;
+	for(i = 0; i < nCarritos; i++){
+		printf("\n======CARRITO==NUMERO==%d=========\n", i);
+		printf("============INSTANTE==%d=========\n", operacion);
+		prodBanda = eliminarElem(carritos[i]);
+		agregarCola(banda, prodBanda);
+		pesoBanda = pesoBanda - prodBanda->peso;
+		complejidadAct = prodBanda->complejidad;
+		imprimirDatos(carritos[i], banda, areaEmb);
+		++operacion;
+		int t = 0;
+
+		//ciclo en el que cada iteracion representa un instante de tiempo (como si el enter fuera presionado automaticamente)
+		while(!facturado){
+			printf("============INSTANTE==%d========\n", operacion);
+			complejidadAct = complejidadAct - velCajera;
+			//comprueba si hay espacio en la banda y saca producto del carrito hacia la banda
+			if(carritos[i]->cant >0 && carritos[i]->head->prod->peso <= pesoBanda){
+				prodBanda = eliminarElem(carritos[i]);
+				agregarCola(banda, prodBanda);
+				pesoBanda = pesoBanda - prodBanda->peso;
+			}
+			//comprueba si el tiempo de procesqamiento del primer objeto de la banda ya paso y cantinua con el siguiente objeto
+			//printf("============PASO PRIMER IF========\n");
+			if(complejidadAct <= 0){
+				prodPila = quitarCola(banda);
+				pesoBanda = pesoBanda + prodPila->peso;
+				if(carritos[i]->cant == 0 && banda->cant == 0){
+					facturado = TRUE;
+				}
+				else{
+					complejidadAct = banda->head->prod->complejidad - complejidadAct;
+				}
+				agregarPila(areaEmb, prodPila);
+			}
+			//comprueba si hay espacio en la banda y saca producto del carrito hacia la banda
+			//printf("============PASO SEGUNDO IF========\n");
+			if(carritos[i]->cant >0 && carritos[i]->head->prod->peso <= pesoBanda){
+				prodBanda = eliminarElem(carritos[i]);
+				agregarCola(banda, prodBanda);
+				pesoBanda = pesoBanda - prodBanda->peso;
+			}
+			//printf("============PASO TERCER IF========\n");
+			++operacion;
+			imprimirDatos(carritos[i], banda, areaEmb);
+			++t;
+		}
+		//termina de procesar a un cliente y reinicia todas las variables
+		tCliente = operacion - 1 + tFacturacion;
+		printf("====CLIENTE NUMERO %d TARDO %d EN SER FACTURADO===\n", i, tCliente);
+		operacion = 0;
+		facturado = FALSE;
+		vaciarPila(areaEmb);
+
+	}
+	/**
+	pesoBanda = maxPesoBanda;
+	printf("============OPERACION==%d=========\n", operacion);
+	prodBanda = eliminarElem(carritos[0]);
+	agregarCola(banda, prodBanda);
+	pesoBanda = pesoBanda - prodBanda->peso;
+	complejidadAct = prodBanda->complejidad;
+	imprimirDatos(carritos[0], banda, areaEmb);
+	++operacion;
+	int t = 0;
+
+	while(!facturado){
+		printf("============OPERACION==%d========\n", operacion);
+		complejidadAct = complejidadAct - velCajera;
+		if(carritos[0]->cant >0 && carritos[0]->head->prod->peso <= pesoBanda){
+			prodBanda = eliminarElem(carritos[0]);
+			agregarCola(banda, prodBanda);
+			pesoBanda = pesoBanda - prodBanda->peso;
+		}
+		//printf("============PASO PRIMER IF========\n");
+		if(complejidadAct <= 0){
+			prodPila = quitarCola(banda);
+			pesoBanda = pesoBanda + prodPila->peso;
+			if(carritos[0]->cant == 0 && banda->cant == 0){
+				facturado = TRUE;
+			}
+			else{
+				complejidadAct = banda->head->prod->complejidad - complejidadAct;
+			}
+			agregarPila(areaEmb, prodPila);
+		}
+		//printf("============PASO SEGUNDO IF========\n");
+		if(carritos[0]->cant >0 && carritos[0]->head->prod->peso <= pesoBanda){
+			prodBanda = eliminarElem(carritos[0]);
+			agregarCola(banda, prodBanda);
+			pesoBanda = pesoBanda - prodBanda->peso;
+		}
+		//printf("============PASO TERCER IF========\n");
+		++operacion;
+		imprimirDatos(carritos[0], banda, areaEmb);
+		++t;
+	}
+	tCliente = operacion - 1 + tFacturacion;
+	printf("CLiente numero %d tardo %d en ser facturado\n", 0, tCliente);
+	operacion = 0;
+	**/
+
 	// Pasar productos del carrito a la Banda.
+
 
 	// Procesar productos de la Banda.
 
@@ -119,7 +295,12 @@ void simulacion(LinkedList *inventario){
 }
 
 
-
+void imprimirDatos(LinkedList *lista, Cola *cola, Pila *pila){
+	//printf("ComplejidadAct:%f\nPesoBanda:%d\n", complejidadAct, pesoBanda);
+	imprimirLista(lista);
+	imprimirCola(cola);
+	imprimirPila(pila);
+}
 
 /*
 Funcion que imprime en pantalla y gestiona el menu de Cambio de configuracion del MarketSimulator.
@@ -163,7 +344,7 @@ void menuConfiguracion(){
 						printf("\nModalidad cambiada exitosamente a: \"%s\"\n", (modalidad ? "Interactiva" : "Automatica"));
 					}
 					break;
-			case 2: printf("\nLa cantidad actual de Ccarritos en la cola es: \"%d\"\n", nCarritos);
+			case 2: printf("\nLa cantidad actual de Carritos en la cola es: \"%d\"\n", nCarritos);
 					printf("Desea cambiarla? (y: Si/otro: No)  ");
 
 					scanf("%c", &opc3);

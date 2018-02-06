@@ -35,11 +35,14 @@ seria la cabeza de la lista, y lo retorna. En caso de que la lista este vacia, r
 */
 Producto *eliminarElem(LinkedList *l){
 	Nodo *aux = l->head;
+	Producto *prodAct;
+	prodAct = aux->prod;
 	if(aux)
 		l->head = l->head->next;
-
+	//printf("'%s' ha sido sacado de la la lista\n", aux->prod->nombre);
 	free(aux);
-	return aux->prod;
+	l->cant = l->cant -1;
+	return prodAct;
 }
 
 /*
@@ -59,9 +62,10 @@ Funcion que se encarga de imprimir los nombres de los Productos que se estan alm
 en la Lista Enlazada 'l'.
 */
 void imprimirLista(LinkedList *l){
+	printf("\n >>>> %d productos en el carrito: <<<<\n", l->cant);
 	Nodo *p = l->head;
 	while(p){
-		printf("%s\n", p->prod->nombre);
+		printf("\t%s\n", p->prod->nombre);
 		p = p->next;
 	}
 }

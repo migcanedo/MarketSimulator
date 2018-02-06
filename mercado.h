@@ -82,6 +82,8 @@ typedef struct Cola
 // Funciones.
 //----------------------------------------------------------------------
 
+void imprimirDatos(LinkedList *, Cola *, Pila *);
+
 /*
 Funcion que se encarga de agregar un Producto 'p' a la Lista Enlazada 'l'.
 */
@@ -133,6 +135,7 @@ Funcion que se encarga de agregar un Producto 'p' a la Pila 's'.
 */
 void agregarPila (Pila *, Producto *);
 
+void vaciarPila (Pila *);
 //ESTA FUNCION SE EBORRARA
 Pila * crearPila();
 
