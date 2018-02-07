@@ -22,8 +22,11 @@ float complejidadAct = 0;
 int pesoBanda;
 int facturado = FALSE;
 int operacion = 0;
+int pesoBolsaAct;
+float tiempoEmbolsadorAct = 0;
 Producto *prodBanda;
 Producto *prodPila;
+Producto *prodBolsa;
 
 int main(int argc, char* argv[]){
 	int opc;
@@ -94,79 +97,23 @@ LinkedList *crearInventario(char *archivo){
 void simulacion(LinkedList *inventario){
 	srand(time(NULL));
 	
-	// Crear los carritos.
+	// Estructuras a utilizar durante la simulacion.
 	LinkedList * carritos[nCarritos];
 	Cola * banda = crearCola();
 	Pila * areaEmb = crearPila();
+	Pila * bolsas[maxProductos]; // Arreglo de Bolsas que en el peor de los casos habria tantas bolsas como productos en el carrito.
+								 // Donde la posicion 0 es donde se guardaran los productos que no quepan en bolsas.
 
-	/**
-	int p, ite;
-	carritos[0] = crearLista();
-	ite = 0;
-	Nodo * n = inventario->head;
-	p = 12;
-	while (ite < p){
-		n = n->next;
-		ite += 1;
-	}
-	agregarElem(carritos[0], n->prod);
+	// Variables locales a usar durante la simulacion.
+	int bolsaAct = 1; // Posicion de la bolsas que se esta llenando actualemente en el arreglo bolsas.
+	int tiempoVaciarAreaEmb = 0; // Tiempo que se tarda en vaciar el AreaEmb luego de empezar a facturar.
+	int tTotal = 0; // Tiempo total de procesar a todos los clientes.
 
-	ite = 0;
-	n = inventario->head;
-	p = 17;
-	while (ite < p){
-		n = n->next;
-		ite += 1;
-	}
-	agregarElem(carritos[0], n->prod);
-
-	ite = 0;
-	n = inventario->head;
-	p = 16;
-	while (ite < p){
-		n = n->next;
-		ite += 1;
-	}
-	agregarElem(carritos[0], n->prod);
-
-	ite = 0;
-	n = inventario->head;
-	p = 23;
-	while (ite < p){
-		n = n->next;
-		ite += 1;
-	}
-	agregarElem(carritos[0], n->prod);
-
-	imprimirDatos(carritos[0], banda, areaEmb);
-	printf("%d%d\n", carritos[0]->cant, banda->cant);
-	**/
-	/**
-	while(carritos[0]->cant >0){
-		prodBanda = eliminarElem(carritos[0]);
-		agregarCola(banda, prodBanda);
-		imprimirDatos(carritos[0], banda, areaEmb);
-	}
-	while(banda->cant > 0){
-		prodPila = quitarCola(banda);
-		agregarPila(areaEmb ,prodPila);
-		imprimirDatos(carritos[0], banda, areaEmb);
-	}**/
-	/**
-	while(carritos[0]->cant > 0){
-		prodBanda = eliminarElem(carritos[0]);
-		agregarCola(banda, prodBanda);
-		prodPila = quitarCola(banda);
-		agregarPila(areaEmb ,prodPila);
-		imprimirDatos(carritos[0], banda, areaEmb);
-	}**/
-
-	printf("\n====CARRITOS==CREADOS====\n");
+	if (modalidad) printf("\n====  CARRITOS CREADOS  ====\n");
 	int i, j, cantProd, p, ite;
 	for(i = 0; i < nCarritos; i++){
 		carritos[i] = crearLista();
 		cantProd = rand() % maxProductos + 1;
-		//printf("-----------------------\n" );
 		for(j = 0; j < cantProd; j++){
 			p = rand() % (inventario->cant);
 			ite = 0;
@@ -177,39 +124,50 @@ void simulacion(LinkedList *inventario){
 			}
 			agregarElem(carritos[i], n->prod);
 		}
-		printf("\n======CARRITO==%d======\n", i);
-		imprimirLista(carritos[i]);
+		if(modalidad){
+			printf("\n======  CARRITO %d  ======\n", i);
+			imprimirLista(carritos[i]);
+		}
 	}
 
 	//Ciclo que procesa a los clientes uno a uno (se empieza a procesar despues de que el cliente acterior haya sido facturado)
 	pesoBanda = maxPesoBanda;
+	pesoBolsaAct = maxPesoBolsa;
+	tiempoEmbolsadorAct = velEmbolsador;
+	bolsas[bolsaAct] = crearPila();
+	bolsas[0] = NULL;
 	for(i = 0; i < nCarritos; i++){
-		printf("\n======CARRITO==NUMERO==%d=========\n", i);
-		printf("============INSTANTE==%d=========\n", operacion);
+		if(modalidad){
+			printf("\n======  CARRITO NUMERO %d  =========\n", i);
+			printf("============  INSTANTE %d  =========\n", operacion);
+		}
+
 		prodBanda = eliminarElem(carritos[i]);
 		agregarCola(banda, prodBanda);
 		pesoBanda = pesoBanda - prodBanda->peso;
 		complejidadAct = prodBanda->complejidad;
-		imprimirDatos(carritos[i], banda, areaEmb);
+		if(modalidad) imprimirDatos(carritos[i], banda, areaEmb, bolsas, bolsaAct);
 		++operacion;
 		int t = 0;
 		
-		printf("Presione enter para pasar al siguiente instante...");
-		while(getchar() != '\n');
+		if(modalidad){
+			printf("====================================\n");		
+			printf("Presione enter para pasar al siguiente instante...");
+			while(getchar() != '\n');
+		}
 
 		//ciclo en el que cada iteracion representa un instante de tiempo (como si el enter fuera presionado automaticamente)
-		while(!facturado){
-			printf("============INSTANTE==%d========\n", operacion);
+		while(!facturado || areaEmb->cant > 0){
+			if(modalidad) printf("\n============  INSTANTE %d  ========\n", operacion);
 			complejidadAct = complejidadAct - velCajera;
 			//comprueba si hay espacio en la banda y saca producto del carrito hacia la banda
-			if(carritos[i]->cant >0 && carritos[i]->head->prod->peso <= pesoBanda){
+			if(carritos[i]->cant > 0 && carritos[i]->head->prod->peso <= pesoBanda){
 				prodBanda = eliminarElem(carritos[i]);
 				agregarCola(banda, prodBanda);
 				pesoBanda = pesoBanda - prodBanda->peso;
 			}
-			//comprueba si el tiempo de procesqamiento del primer objeto de la banda ya paso y cantinua con el siguiente objeto
-			//printf("============PASO PRIMER IF========\n");
-			if(complejidadAct <= 0){
+			//comprueba si el tiempo de procesamiento del primer objeto de la banda ya paso y cantinua con el siguiente objeto
+			if(complejidadAct <= 0 && !facturado){
 				prodPila = quitarCola(banda);
 				pesoBanda = pesoBanda + prodPila->peso;
 				if(carritos[i]->cant == 0 && banda->cant == 0){
@@ -221,84 +179,99 @@ void simulacion(LinkedList *inventario){
 				agregarPila(areaEmb, prodPila);
 			}
 			//comprueba si hay espacio en la banda y saca producto del carrito hacia la banda
-			//printf("============PASO SEGUNDO IF========\n");
-			if(carritos[i]->cant >0 && carritos[i]->head->prod->peso <= pesoBanda){
+			if(carritos[i]->cant > 0 && carritos[i]->head->prod->peso <= pesoBanda){
 				prodBanda = eliminarElem(carritos[i]);
 				agregarCola(banda, prodBanda);
 				pesoBanda = pesoBanda - prodBanda->peso;
 			}
-			//printf("============PASO TERCER IF========\n");
+
+			// Comprueba si hay productos en el AreaEmb y si ha pasado el tiempo de abrir una bolsa.
+			if (areaEmb->cant > 0 && tiempoEmbolsadorAct >= velEmbolsador){
+
+				// Si el producto del AreaEmb es mayor que el peso q soporta una bolsa, se procesa de inmediato
+				// y se guarda en una 'bolsa' especial para ellos.
+				if (areaEmb->head->prod->peso > maxPesoBolsa){
+					if (bolsas[0] == NULL) bolsas[0] = crearPila();
+					prodBolsa = quitarPila(areaEmb);
+					agregarPila(bolsas[0], prodBolsa);
+				}
+				// Si el producto antual entra en la bolsa, se guarda en ella.
+				else if(areaEmb->head->prod->peso <= pesoBolsaAct){
+				 	prodBolsa = quitarPila(areaEmb);
+				 	agregarPila(bolsas[bolsaAct], prodBolsa);
+				 	pesoBolsaAct -= prodBolsa->peso;
+				}
+				// Si el producto actual no entra en la bolsa, se crea la siguiente bolsa y se reinicia
+				// el tiempo de abrir una bolsa.
+				else{
+				 	pesoBolsaAct = maxPesoBolsa;
+				 	bolsaAct++;
+				 	bolsas[bolsaAct] = crearPila();
+				 	tiempoEmbolsadorAct = 1; // Se reinicia a 1 porq ya considero este instante actual como que ya estoy abriendo la bosla.
+				}
+			}
+
 			++operacion;
-			imprimirDatos(carritos[i], banda, areaEmb);
+			
+			// Si el tiempo de abrir una bolsa aun no ha pasado, se le suma un seg
+			if(tiempoEmbolsadorAct < velEmbolsador) tiempoEmbolsadorAct++;
+
+			// Si ya esta facturado la cajera pero aun hay productos en el area de embolsado,
+			// sumamos cuantos instantes toma vaciar el AreaEmb para luego restarselo al tiempo de 
+			// facturado que se vaya a sumar.
+			if(facturado) tiempoVaciarAreaEmb++;
+
 			++t;
-			printf("Presione enter para pasar al siguiente instante...");
-			while(getchar() != '\n');
+			if(modalidad){ 
+				imprimirDatos(carritos[i], banda, areaEmb, bolsas, bolsaAct);
+				printf("====================================\n\n");
+				printf("Presione enter para pasar al siguiente instante...");
+				while(getchar() != '\n');
+			}
 		}
-		//termina de procesar a un cliente y reinicia todas las variables
-		tCliente = operacion - 1 + tFacturacion;
-		printf("====CLIENTE NUMERO %d TARDO %d EN SER FACTURADO===\n", i, tCliente);
+		// Termina de procesar a un cliente y se calcula su tiempo de ser atendido.
+
+		// Aqui preguntamos si el tiempo de facturacion es mayor o igual al tiempo qu tomo terminar de vaciar el AreaEmb.
+		// En caso de q sea afirmativo se suma la diferencia de ambos, en caso contrario se suma solo el tiempo que tomo
+		// vaciar el AreaEmb.
+		tCliente = operacion - 1 + (tFacturacion >= tiempoVaciarAreaEmb ? tFacturacion - tiempoVaciarAreaEmb : tiempoVaciarAreaEmb);
+		printf("\n\n=======  CLIENTE NUMERO %d TARDO %dseg EN SER FACTURADO  ======\n\n", i, tCliente);
+
+		tTotal += tCliente;
+		// Se reinician las variables, se elimina el carrito actual y se vacian las bolsas para volverlas a usar.
 		operacion = 0;
+		bolsaAct = 1;
+		tiempoVaciarAreaEmb = 0;
 		facturado = FALSE;
-		vaciarPila(areaEmb);
-
-		// Elimina los carritos luego de q hayas acabados con ellos, asi liberaras espacio en memoria.
-		// Lo mismo con la Pila y la Cola al acabar el programa.
-		// Por lo que veo todo esta bien, agrege lo de perdir el enter.
+		eliminarLista(carritos[i]);
+		for(j=0; j <= bolsaAct; j++){
+			if (bolsas[j] != NULL) vaciarPila(bolsas[j]);
+		}
 	}
-	/**
-	pesoBanda = maxPesoBanda;
-	printf("============OPERACION==%d=========\n", operacion);
-	prodBanda = eliminarElem(carritos[0]);
-	agregarCola(banda, prodBanda);
-	pesoBanda = pesoBanda - prodBanda->peso;
-	complejidadAct = prodBanda->complejidad;
-	imprimirDatos(carritos[0], banda, areaEmb);
-	++operacion;
-	int t = 0;
-
-	while(!facturado){
-		printf("============OPERACION==%d========\n", operacion);
-		complejidadAct = complejidadAct - velCajera;
-		if(carritos[0]->cant >0 && carritos[0]->head->prod->peso <= pesoBanda){
-			prodBanda = eliminarElem(carritos[0]);
-			agregarCola(banda, prodBanda);
-			pesoBanda = pesoBanda - prodBanda->peso;
-		}
-		//printf("============PASO PRIMER IF========\n");
-		if(complejidadAct <= 0){
-			prodPila = quitarCola(banda);
-			pesoBanda = pesoBanda + prodPila->peso;
-			if(carritos[0]->cant == 0 && banda->cant == 0){
-				facturado = TRUE;
-			}
-			else{
-				complejidadAct = banda->head->prod->complejidad - complejidadAct;
-			}
-			agregarPila(areaEmb, prodPila);
-		}
-		//printf("============PASO SEGUNDO IF========\n");
-		if(carritos[0]->cant >0 && carritos[0]->head->prod->peso <= pesoBanda){
-			prodBanda = eliminarElem(carritos[0]);
-			agregarCola(banda, prodBanda);
-			pesoBanda = pesoBanda - prodBanda->peso;
-		}
-		//printf("============PASO TERCER IF========\n");
-		++operacion;
-		imprimirDatos(carritos[0], banda, areaEmb);
-		++t;
-	}
-	tCliente = operacion - 1 + tFacturacion;
-	printf("CLiente numero %d tardo %d en ser facturado\n", 0, tCliente);
-	operacion = 0;
-	**/
+	printf("\n\n=======  TIEMPO TOTAL: %dseg  ======\n\n", tTotal);		
+	// eliminarCola(banda);
+	// eliminarPila(areaEmb);
 }
 
 
-void imprimirDatos(LinkedList *lista, Cola *cola, Pila *pila){
+void imprimirDatos(LinkedList *lista, Cola *cola, Pila *pila, Pila *bolsas[], int cantBolsas){
 	//printf("ComplejidadAct:%f\nPesoBanda:%d\n", complejidadAct, pesoBanda);
+	printf("\n >>>> %d productos en el carrito: <<<<\n", lista->cant);
 	imprimirLista(lista);
+	printf("\n >>>> %d productos en la cola: <<<<\n", cola->cant);
 	imprimirCola(cola);
+	printf("\n >>>> %d Productos en la pila: <<<<\n", pila->cant);
 	imprimirPila(pila);
+	int i;
+	for(i = 0; i <= cantBolsas; i++){
+		if (i == 0 && bolsas[i] != NULL){
+			printf("\n >>>> %d Productos fuera de Bolsa: <<<<\n", bolsas[i]->cant);
+			imprimirPila(bolsas[i]);
+		}else if (i > 0){
+			printf("\n >>>> %d Productos en la Bolsa %d: <<<<\n", bolsas[i]->cant, i);
+			imprimirPila(bolsas[i]);
+		}
+	}
 }
 
 /*

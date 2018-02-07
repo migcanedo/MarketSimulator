@@ -82,7 +82,7 @@ typedef struct Cola
 // Funciones.
 //----------------------------------------------------------------------
 
-void imprimirDatos(LinkedList *, Cola *, Pila *);
+void imprimirDatos(LinkedList *lista, Cola *cola, Pila *pila, Pila *bolsas[], int cantBolsas);
 
 /*
 Funcion que se encarga de agregar un Producto 'p' a la Lista Enlazada 'l'.

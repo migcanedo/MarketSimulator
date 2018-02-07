@@ -61,7 +61,6 @@ Funcion que se encarga de imprimir los nombres de los Productos que se estan alm
 en la Cola 'c'.
 */
 void imprimirCola (Cola *c) {
-	printf("\n >>>> %d productos en la cola: <<<<\n", c->cant);
 	Nodo *actual = c->head;
 	int i = 1;
 	while(i<= c->cant){

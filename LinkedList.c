@@ -62,7 +62,6 @@ Funcion que se encarga de imprimir los nombres de los Productos que se estan alm
 en la Lista Enlazada 'l'.
 */
 void imprimirLista(LinkedList *l){
-	printf("\n >>>> %d productos en el carrito: <<<<\n", l->cant);
 	Nodo *p = l->head;
 	while(p){
 		printf("\t%s\n", p->prod->nombre);

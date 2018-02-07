@@ -49,7 +49,6 @@ Funcion que se encarga de imprimir los nombres de los Productos que se estan alm
 en la Pila 's'.
 */
 void imprimirPila (Pila *s) {
-	printf("\n >>>> %d Productos en la pila: <<<<\n", s->cant);
 	Nodo *actual = s->head;
 	int i = 1;
 	while(i<= s->cant){
