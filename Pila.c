@@ -59,7 +59,6 @@ void imprimirPila (Pila *s) {
 }
 
 void vaciarPila (Pila *s) {
-	Nodo *actual = s->head;
 	int i = 0;
 	while(i < s->cant){
 		quitarPila(s);

@@ -72,3 +72,10 @@ void imprimirCola (Cola *c) {
 		++i;
 	}
 }
+
+void eliminarCola (Cola *c) {
+	int i = 0;
+	while(i< c->cant){
+		quitarCola(c);
+	}
+}

@@ -170,3 +170,5 @@ Funcion que se encarga de imprimir los nombres de los Productos que se estan alm
 en la Cola 'c'.
 */
 void imprimirCola(Cola *);
+
+void eliminarCola (Cola *);

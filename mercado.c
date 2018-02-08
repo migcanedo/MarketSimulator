@@ -10,23 +10,14 @@ typedef int bool;
 int modalidad = 1; // 1 := Interactiva || 2 := Automatica
 int nCarritos = 3;
 int maxProductos = 5;
-int maxPesoBanda = 240;
+int maxPesoBanda = 300;
 float velCajera = 1.0;
 float velEmbolsador = 4;
 int tFacturacion = 130;
 int maxPesoAreaEmbolsado = 150;
 int maxPesoBolsa = 120;
+char *nombreArch;
 
-int tCliente = 0;
-float complejidadAct = 0;
-int pesoBanda;
-int facturado = FALSE;
-int operacion = 0;
-int pesoBolsaAct;
-float tiempoEmbolsadorAct = 0;
-Producto *prodBanda;
-Producto *prodPila;
-Producto *prodBolsa;
 
 int main(int argc, char* argv[]){
 	int opc;
@@ -35,7 +26,9 @@ int main(int argc, char* argv[]){
 		exit(1);
 	}
 	
+	
 	LinkedList * inventario = crearInventario(argv[1]);
+	nombreArch = argv[1];
 
 
 	printf("\nBienvenido al MarketSimulator!\n");
@@ -57,7 +50,8 @@ int main(int argc, char* argv[]){
 			case 2: 
 				menuConfiguracion();
 				break;
-			case 3: exit(0);
+			case 3:
+				exit(0);
 			default: printf("\nOpcion Invalida. Elija una opcion valida del menu.\n"); 
 		}
 	}
@@ -95,16 +89,27 @@ LinkedList *crearInventario(char *archivo){
 
 */
 void simulacion(LinkedList *inventario){
+
+	FILE *logfile = fopen ("ArchivoDeRegistro.log", "a");
+	fprintf(logfile, "Archivo: %c Cantidad carritos: %d ", *nombreArch, nCarritos);
+
 	srand(time(NULL));
 	
 	// Estructuras a utilizar durante la simulacion.
 	LinkedList * carritos[nCarritos];
 	Cola * banda = crearCola();
 	Pila * areaEmb = crearPila();
-	Pila * bolsas[maxProductos]; // Arreglo de Bolsas que en el peor de los casos habria tantas bolsas como productos en el carrito.
+	Pila * bolsas[maxProductos+1]; // Arreglo de Bolsas que en el peor de los casos habria tantas bolsas como productos en el carrito.
 								 // Donde la posicion 0 es donde se guardaran los productos que no quepan en bolsas.
 
 	// Variables locales a usar durante la simulacion.
+	int tCliente = 0; // Tiempo que toma el cliente en terminar sus compras
+	float complejidadAct = 0; // Variable auxiliar para evaluar el tiempo que toma procesar un producto
+	int pesoBanda; // Variable auxiliar para tomar en cuenta la limitacion de la banda
+	int facturado = FALSE;	// Variable que muestra si ya el cliente esta siendo facturado o no 
+	int operacion = 0; // Instantes que se han recorrido
+	int pesoBolsaAct;	// Varibale que sirve para llevar la cuenta de la capcidad de la bolsa
+	float tiempoEmbolsadorAct = 0; // Inicio del proceso de embolsado
 	int bolsaAct = 1; // Posicion de la bolsas que se esta llenando actualemente en el arreglo bolsas.
 	int tiempoVaciarAreaEmb = 0; // Tiempo que se tarda en vaciar el AreaEmb luego de empezar a facturar.
 	int tTotal = 0; // Tiempo total de procesar a todos los clientes.
@@ -125,21 +130,29 @@ void simulacion(LinkedList *inventario){
 			agregarElem(carritos[i], n->prod);
 		}
 		if(modalidad){
-			printf("\n======  CARRITO %d  ======\n", i);
+			printf("\n======  CARRITO %d  ======\n", i+1);
+			fprintf(logfile, "Productos carrito %d: %d ", i+1, carritos[i]->cant);
 			imprimirLista(carritos[i]);
 		}
 	}
 
-	//Ciclo que procesa a los clientes uno a uno (se empieza a procesar despues de que el cliente acterior haya sido facturado)
+	fprintf(logfile, "Capacidad banda: %d Velocidad cajera: %f ", maxPesoBanda, velCajera);
+	fprintf(logfile, "Velocidad embolsador: %f Tiempo de facturacion: %d ", velEmbolsador, tFacturacion);
+	fprintf(logfile, "Capacidad area de embolsado: %d Capacidad de bolsa: %d ",  maxPesoAreaEmbolsado, maxPesoBolsa);
+	//Ciclo que procesa a los clientes uno a uno (se empieza a procesar despues de que el cliente anterior haya sido facturado)
+	Producto *prodBanda;
+	Producto *prodPila;
+	Producto *prodBolsa;
+
 	pesoBanda = maxPesoBanda;
 	pesoBolsaAct = maxPesoBolsa;
-	tiempoEmbolsadorAct = velEmbolsador;
+	tiempoEmbolsadorAct = 1;
 	bolsas[bolsaAct] = crearPila();
 	bolsas[0] = NULL;
 	for(i = 0; i < nCarritos; i++){
 		if(modalidad){
-			printf("\n======  CARRITO NUMERO %d  =========\n", i);
-			printf("============  INSTANTE %d  =========\n", operacion);
+			printf("\n======  CARRITO NUMERO %d  =========\n", i+1);
+			printf("============  INSTANTE %d  =========\n", operacion+1);
 		}
 
 		prodBanda = eliminarElem(carritos[i]);
@@ -158,7 +171,7 @@ void simulacion(LinkedList *inventario){
 
 		//ciclo en el que cada iteracion representa un instante de tiempo (como si el enter fuera presionado automaticamente)
 		while(!facturado || areaEmb->cant > 0){
-			if(modalidad) printf("\n============  INSTANTE %d  ========\n", operacion);
+			if(modalidad) printf("\n============  INSTANTE %d  ========\n", operacion+1);
 			complejidadAct = complejidadAct - velCajera;
 			//comprueba si hay espacio en la banda y saca producto del carrito hacia la banda
 			if(carritos[i]->cant > 0 && carritos[i]->head->prod->peso <= pesoBanda){
@@ -234,9 +247,9 @@ void simulacion(LinkedList *inventario){
 		// Aqui preguntamos si el tiempo de facturacion es mayor o igual al tiempo qu tomo terminar de vaciar el AreaEmb.
 		// En caso de q sea afirmativo se suma la diferencia de ambos, en caso contrario se suma solo el tiempo que tomo
 		// vaciar el AreaEmb.
-		tCliente = operacion - 1 + (tFacturacion >= tiempoVaciarAreaEmb ? tFacturacion - tiempoVaciarAreaEmb : tiempoVaciarAreaEmb);
-		printf("\n\n=======  CLIENTE NUMERO %d TARDO %dseg EN SER FACTURADO  ======\n\n", i, tCliente);
-
+		tCliente = operacion + (tFacturacion >= tiempoVaciarAreaEmb ? tFacturacion - tiempoVaciarAreaEmb : tiempoVaciarAreaEmb);
+		printf("\n\n=======  CLIENTE NUMERO %d TARDO %dseg EN SER FACTURADO  ======\n\n", i+1, tCliente);
+		fprintf(logfile, "Tiempo cliente numero %d: %d ", i+1, tCliente);
 		tTotal += tCliente;
 		// Se reinician las variables, se elimina el carrito actual y se vacian las bolsas para volverlas a usar.
 		operacion = 0;
@@ -248,7 +261,9 @@ void simulacion(LinkedList *inventario){
 			if (bolsas[j] != NULL) vaciarPila(bolsas[j]);
 		}
 	}
-	printf("\n\n=======  TIEMPO TOTAL: %dseg  ======\n\n", tTotal);		
+	printf("\n\n=======  TIEMPO TOTAL: %dseg  ======\n\n", tTotal);	
+	fprintf(logfile, "Tiempo total: %d\n", tTotal);
+	fclose(logfile);	
 	// eliminarCola(banda);
 	// eliminarPila(areaEmb);
 }
