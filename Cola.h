@@ -1,11 +1,36 @@
-#include "mercado.h"
-#define FOR(i, a, b) int i; for(i = (a); i < (b); i++)
-#define TRUE 0 == 0
-#define FALSE !TRUE
-
 //----------------------------------------------------------------------
 // Estructura
 //----------------------------------------------------------------------
+/*
+Estructura que se comportara como un Nodo de diferentes estructuras de 
+almacenamiento. En ella se guardara el nombre, peso y complejidad de
+procesamiento del Producto; ademas de guardar la direccion del Producto 
+siguiente a el mismo segun en la estructura que se eencuentre  almacenando.
+*/
+#ifndef NODO_PROD
+#define NODO_PROD
+typedef struct Producto
+{
+	char nombre[100];
+	int peso;
+	float complejidad;
+} Producto;
+
+
+/*
+Estructura qeu se comportara como un Nodo para las diferentes estructuras 
+de Almacenamiento. En ella se guardaran el apuntador al Producto que se esta
+almacenando en el Nodo, el apuntador hacia el Nodo que le sigue al mismo en la 
+estructura de almacenamiento y un apuntador hacia la estructura Nodo previa.
+*/
+typedef struct Nodo
+{
+	Producto * prod;
+	struct Nodo * next;
+	struct Nodo * prev;
+}Nodo;
+
+#endif
 
 /* 
 Estructura que se comportara como una COla trabajando con una lista enlazada,
@@ -30,7 +55,10 @@ Funcion que se encarga de agregar un Producto 'p' a la Cola 'c'.
 */
 void agregarCola (Cola *, Producto *);
 
-//ESTA FUNCION SE BORRARA
+/*
+Funcion que se encarga de crear el espacio en memoria para una Cola y retornar 
+un apuntador a ese espacio.
+*/
 Cola * crearCola ();
 
 /*
@@ -44,3 +72,9 @@ Funcion que se encarga de imprimir los nombres de los Productos que se estan alm
 en la Cola 'c'.
 */
 void imprimirCola(Cola *);
+
+
+/*
+Funcion que se encarga de vaciar la Cola indicada por parametro. 
+*/
+void vaciarCola(Cola *);

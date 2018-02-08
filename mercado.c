@@ -2,23 +2,26 @@
 #include <stdlib.h>
 #include <time.h>
 #include "mercado.h"
-#define true 1
-#define false 0
-
 
 typedef int bool;
-int modalidad = 1; // 1 := Interactiva || 2 := Automatica
+
+// Variables Globales
+
+int modalidad = 1; // 1 := Interactiva || 0 := Automatica
 int nCarritos = 3;
-int maxProductos = 5;
-int maxPesoBanda = 300;
+int maxProductos = 5; // 30
+int maxPesoBanda = 300; // 200
 float velCajera = 1.0;
 float velEmbolsador = 4;
 int tFacturacion = 130;
 int maxPesoAreaEmbolsado = 150;
 int maxPesoBolsa = 120;
+
 char *nombreArch;
 
-
+/*
+Funcion main del Programa de MarketSimulator.
+*/
 int main(int argc, char* argv[]){
 	int opc;
 	if (argc < 2){
@@ -86,12 +89,13 @@ LinkedList *crearInventario(char *archivo){
 }
 
 /*
-
+Funcion que se encarga de ejecutar la simulacion del mercado, con el Inventario que se le pasa por argumento y
+utilizando la configuracion global del programa.
 */
 void simulacion(LinkedList *inventario){
 
 	FILE *logfile = fopen ("ArchivoDeRegistro.log", "a");
-	fprintf(logfile, "Archivo: %c Cantidad carritos: %d ", *nombreArch, nCarritos);
+	fprintf(logfile, "Archivo: %s Cantidad carritos: %d ", nombreArch, nCarritos);
 
 	srand(time(NULL));
 	
@@ -101,6 +105,7 @@ void simulacion(LinkedList *inventario){
 	Pila * areaEmb = crearPila();
 	Pila * bolsas[maxProductos+1]; // Arreglo de Bolsas que en el peor de los casos habria tantas bolsas como productos en el carrito.
 								 // Donde la posicion 0 es donde se guardaran los productos que no quepan en bolsas.
+
 
 	// Variables locales a usar durante la simulacion.
 	int tCliente = 0; // Tiempo que toma el cliente en terminar sus compras
@@ -114,7 +119,7 @@ void simulacion(LinkedList *inventario){
 	int tiempoVaciarAreaEmb = 0; // Tiempo que se tarda en vaciar el AreaEmb luego de empezar a facturar.
 	int tTotal = 0; // Tiempo total de procesar a todos los clientes.
 
-	if (modalidad) printf("\n====  CARRITOS CREADOS  ====\n");
+	if (modalidad) printf("\n=========  CARRITOS CREADOS  =========\n");
 	int i, j, cantProd, p, ite;
 	for(i = 0; i < nCarritos; i++){
 		carritos[i] = crearLista();
@@ -139,6 +144,9 @@ void simulacion(LinkedList *inventario){
 	fprintf(logfile, "Capacidad banda: %d Velocidad cajera: %f ", maxPesoBanda, velCajera);
 	fprintf(logfile, "Velocidad embolsador: %f Tiempo de facturacion: %d ", velEmbolsador, tFacturacion);
 	fprintf(logfile, "Capacidad area de embolsado: %d Capacidad de bolsa: %d ",  maxPesoAreaEmbolsado, maxPesoBolsa);
+
+	printf("\n==================  INICIO DE SIMULACION  ==================\n");
+
 	//Ciclo que procesa a los clientes uno a uno (se empieza a procesar despues de que el cliente anterior haya sido facturado)
 	Producto *prodBanda;
 	Producto *prodPila;
@@ -151,8 +159,8 @@ void simulacion(LinkedList *inventario){
 	bolsas[0] = NULL;
 	for(i = 0; i < nCarritos; i++){
 		if(modalidad){
-			printf("\n======  CARRITO NUMERO %d  =========\n", i+1);
-			printf("============  INSTANTE %d  =========\n", operacion+1);
+			printf("\n================  CARRITO NUMERO %d  ================\n", i+1);
+			printf("=================  INSTANTE %d  =================\n", operacion+1);
 		}
 
 		prodBanda = eliminarElem(carritos[i]);
@@ -164,14 +172,14 @@ void simulacion(LinkedList *inventario){
 		int t = 0;
 		
 		if(modalidad){
-			printf("====================================\n");		
+			printf("================================================\n");	
 			printf("Presione enter para pasar al siguiente instante...");
 			while(getchar() != '\n');
 		}
 
 		//ciclo en el que cada iteracion representa un instante de tiempo (como si el enter fuera presionado automaticamente)
 		while(!facturado || areaEmb->cant > 0){
-			if(modalidad) printf("\n============  INSTANTE %d  ========\n", operacion+1);
+			if(modalidad) printf("\n=================  INSTANTE %d  =================\n", operacion+1);
 			complejidadAct = complejidadAct - velCajera;
 			//comprueba si hay espacio en la banda y saca producto del carrito hacia la banda
 			if(carritos[i]->cant > 0 && carritos[i]->head->prod->peso <= pesoBanda){
@@ -237,7 +245,7 @@ void simulacion(LinkedList *inventario){
 			++t;
 			if(modalidad){ 
 				imprimirDatos(carritos[i], banda, areaEmb, bolsas, bolsaAct);
-				printf("====================================\n\n");
+				printf("================================================\n\n");
 				printf("Presione enter para pasar al siguiente instante...");
 				while(getchar() != '\n');
 			}
@@ -248,34 +256,43 @@ void simulacion(LinkedList *inventario){
 		// En caso de q sea afirmativo se suma la diferencia de ambos, en caso contrario se suma solo el tiempo que tomo
 		// vaciar el AreaEmb.
 		tCliente = operacion + (tFacturacion >= tiempoVaciarAreaEmb ? tFacturacion - tiempoVaciarAreaEmb : tiempoVaciarAreaEmb);
-		printf("\n\n=======  CLIENTE NUMERO %d TARDO %dseg EN SER FACTURADO  ======\n\n", i+1, tCliente);
+		printf("\n\n============  CLIENTE NUMERO %d TARDO %dseg EN SER FACTURADO  ===========\n\n", i+1, tCliente);
+
 		fprintf(logfile, "Tiempo cliente numero %d: %d ", i+1, tCliente);
 		tTotal += tCliente;
+
 		// Se reinician las variables, se elimina el carrito actual y se vacian las bolsas para volverlas a usar.
 		operacion = 0;
 		bolsaAct = 1;
 		tiempoVaciarAreaEmb = 0;
+		pesoBolsaAct = maxPesoBolsa;
 		facturado = FALSE;
-		eliminarLista(carritos[i]);
+
 		for(j=0; j <= bolsaAct; j++){
 			if (bolsas[j] != NULL) vaciarPila(bolsas[j]);
 		}
+		bolsas[0] = NULL;	
+		eliminarLista(carritos[i]);
 	}
 	printf("\n\n=======  TIEMPO TOTAL: %dseg  ======\n\n", tTotal);	
-	fprintf(logfile, "Tiempo total: %d\n", tTotal);
-	fclose(logfile);	
-	// eliminarCola(banda);
-	// eliminarPila(areaEmb);
+	fprintf(logfile, "Tiempo total: %d \n", tTotal);
+	fclose(logfile);
+	
+	free(banda);
+	free(areaEmb);
 }
 
-
+/*
+Funcion que se encarga de imprimir en pantalla de forma ordenada los elementos que pertenecen 
+a una Lista Enlazada, una Cola, una Pila y un Arreglo de Pilas de tama;o 'cantBolsas'.
+*/
 void imprimirDatos(LinkedList *lista, Cola *cola, Pila *pila, Pila *bolsas[], int cantBolsas){
 	//printf("ComplejidadAct:%f\nPesoBanda:%d\n", complejidadAct, pesoBanda);
-	printf("\n >>>> %d productos en el carrito: <<<<\n", lista->cant);
+	printf("\n >>>> %d productos en el Carrito: <<<<\n", lista->cant);
 	imprimirLista(lista);
-	printf("\n >>>> %d productos en la cola: <<<<\n", cola->cant);
+	printf("\n >>>> %d productos en la Banda: <<<<\n", cola->cant);
 	imprimirCola(cola);
-	printf("\n >>>> %d Productos en la pila: <<<<\n", pila->cant);
+	printf("\n >>>> %d Productos en el Area de Embolsado: <<<<\n", pila->cant);
 	imprimirPila(pila);
 	int i;
 	for(i = 0; i <= cantBolsas; i++){
@@ -297,6 +314,8 @@ void menuConfiguracion(){
 	char opc3;
 	int aux;
 	float aux1;
+	int auxEvaluador;
+	float auxEvaluador1;
 	bool config = true;
 
 	while (config){
@@ -312,7 +331,7 @@ void menuConfiguracion(){
 		printf("\t7. Cambiar el tiempo de facturacion.\n");
 		printf("\t8. Cambiar la capacidad maxima del area de embolsado.\n");
 		printf("\t9. Cambiar la capacidad maxima de las bolsas.\n");
-		printf("\t10. Salir de menu de configuracion.\n");
+		printf("\t0. Salir de menu de configuracion.\n");
 		printf(">> ");
 
 		scanf("%d", &opc2);
@@ -340,8 +359,14 @@ void menuConfiguracion(){
 					if (opc3 == 'y') {
 						aux = nCarritos;
 						printf("Indique la nueva cantidad de Carritos que habra en la cola: ");
-						scanf("%d", &nCarritos);
+						scanf("%d", &auxEvaluador);
 						getchar();
+
+						if(auxEvaluador < 0){
+							printf("\nCantidad de Carritos no valida.\n");
+							break;
+						}
+						nCarritos = auxEvaluador;
 						
 						printf("\nLa cantidad de Carritos en la cola se ha cambiado exitosamente de: \"%d\" a: \"%d\"\n", 
 																												aux, nCarritos);
@@ -356,8 +381,14 @@ void menuConfiguracion(){
 					if (opc3 == 'y') {
 						aux = maxProductos;
 						printf("Indique la nueva cantidad maxima de Productos por Carrito: ");
-						scanf("%d", &maxProductos);
+						scanf("%d", &auxEvaluador);
 						getchar();
+
+						if(auxEvaluador < 0){
+							printf("\nCantidad Maxima de Productos por Carritos no valida.\n");
+							break;
+						}
+						maxProductos = auxEvaluador;
 						
 						printf("\nLa cantidad maxima de Prodcutos por Carrito se ha cambiado exitosamente de: \"%d\" a: \"%d\"\n", 
 																												aux, maxProductos);
@@ -372,9 +403,15 @@ void menuConfiguracion(){
 					if (opc3 == 'y') {
 						aux = maxPesoBanda;
 						printf("Indique la nueva capacidad maxima de la Banda: ");
-						scanf("%d", &maxPesoBanda);
+						scanf("%d", &auxEvaluador);
 						getchar();
 						
+						if(auxEvaluador < 0){
+							printf("\nCapacidad de la Banda no valida.\n");
+							break;
+						}
+						maxPesoBanda = auxEvaluador;
+
 						printf("\nLa capacidad maxima de la Banda se ha cambiado exitosamente de: \"%dcc\" a: \"%dcc\"\n", 
 																												aux, maxPesoBanda);
 					}
@@ -388,8 +425,14 @@ void menuConfiguracion(){
 					if (opc3 == 'y') {
 						aux1 = velCajera;
 						printf("Indique la nueva cantidad de Operaciones por Segundo que realizara la Cajera: ");
-						scanf("%f", &velCajera);
+						scanf("%f", &auxEvaluador1);
 						getchar();
+
+						if(auxEvaluador1 < 0){
+							printf("\nVelocidad de Cajera no valida.\n");
+							break;
+						}
+						velCajera = auxEvaluador1;
 						
 						printf("\nLa cantidad de Operaciones por Segundo que realiza la Cajera se ha cambiado exitosamente de: \"%f\" a: \"%f\"\n", 
 																												aux1, velCajera);
@@ -404,8 +447,14 @@ void menuConfiguracion(){
 					if (opc3 == 'y') {
 						aux1 = velEmbolsador;
 						printf("Indique la nueva cantidad de Segundos por Bolsa que requiere el Embolsador: ");
-						scanf("%f", &velEmbolsador);
+						scanf("%f", &auxEvaluador1);
 						getchar();
+
+						if(auxEvaluador1 < 0){
+							printf("\nVelocidad de Embolsador no valida.\n");
+							break;
+						}
+						velEmbolsador = auxEvaluador1;
 						
 						printf("\nLa cantidad de Segundos por Bolsa que requiere el Embolsador se ha cambiado exitosamente de: \"%f\" a: \"%f\"\n", 
 																												aux1, velEmbolsador);
@@ -420,9 +469,15 @@ void menuConfiguracion(){
 					if (opc3 == 'y') {
 						aux = tFacturacion;
 						printf("Indique el nuevo tiempo de Facturacion: ");
-						scanf("%d", &tFacturacion);
+						scanf("%d", &auxEvaluador);
 						getchar();
 						
+						if(auxEvaluador < 0){
+							printf("\nTiempo de Facturacion no valido.\n");
+							break;
+						}
+						tFacturacion = auxEvaluador;
+
 						printf("\nEl tiempo de Facturacion se ha cambiado exitosamente de: \"%ds\" a: \"%ds\"\n", 
 																												aux, tFacturacion);
 					}
@@ -436,8 +491,14 @@ void menuConfiguracion(){
 					if (opc3 == 'y') {
 						aux = maxPesoAreaEmbolsado;
 						printf("Indique la nueva capacidad maxima del Area de Embolsado: ");
-						scanf("%d", &maxPesoAreaEmbolsado);
+						scanf("%d", &auxEvaluador);
 						getchar();
+
+						if(auxEvaluador < 0){
+							printf("\nCapacidad de Area de Embolsado no valida.\n");
+							break;
+						}
+						maxPesoAreaEmbolsado = auxEvaluador;
 						
 						printf("\nLa capacidad maxima del Area de Embolsado se ha cambiado exitosamente de: \"%dcc\" a: \"%dcc\"\n", 
 																												aux, maxPesoAreaEmbolsado);
@@ -452,14 +513,20 @@ void menuConfiguracion(){
 					if (opc3 == 'y') {
 						aux = maxPesoBolsa;
 						printf("Indique la nueva capacidad maxima de las Bolsas: ");
-						scanf("%d", &maxPesoBolsa);
+						scanf("%d", &auxEvaluador);
 						getchar();
 						
+						if(auxEvaluador < 0){
+							printf("\nCapacidad de Bolsas no valida.\n");
+							break;
+						}
+						maxPesoBolsa = auxEvaluador;
+
 						printf("\nLa capacidad maxima de las Bolsas se ha cambiado exitosamente de: \"%dcc\" a: \"%dcc\"\n", 
 																												aux, maxPesoBolsa);
 					}
 					break;
-			case 10: config = FALSE;
+			case 0: config = FALSE;
 					break;
 			default: printf("\nOpcion Invalida. Elija una opcion valida del menu.\n");
 		}

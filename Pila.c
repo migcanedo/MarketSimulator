@@ -58,9 +58,12 @@ void imprimirPila (Pila *s) {
 	}
 }
 
+/*
+Funcion que se encarga de vaciar la Pila indicada por parametro. 
+*/
 void vaciarPila (Pila *s) {
 	int i = 0;
-	while(i < s->cant){
+	while(s->cant > 0){
 		quitarPila(s);
 	}
 }

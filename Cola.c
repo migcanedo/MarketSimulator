@@ -73,9 +73,12 @@ void imprimirCola (Cola *c) {
 	}
 }
 
-void eliminarCola (Cola *c) {
-	int i = 0;
-	while(i< c->cant){
+
+/*
+Funcion que se encarga de vaciar la Cola indicada por parametro. 
+*/
+void vaciarCola (Cola *c) {
+	while(c->cant > 0){
 		quitarCola(c);
 	}
 }

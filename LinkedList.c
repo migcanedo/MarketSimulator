@@ -81,4 +81,5 @@ void eliminarLista(LinkedList *l){
 		free(p);
 		p = aux;
 	}
+	free(l);
 }
