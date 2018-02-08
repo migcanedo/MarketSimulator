@@ -1,4 +1,4 @@
-CC = gcc
+CC = gcc 
 Structures = LinkedList.o Pila.o Cola.o
 
 mercado: mercado.o $(Structures)

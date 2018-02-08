@@ -10,7 +10,7 @@ typedef int bool;
 int modalidad = 1; // 1 := Interactiva || 0 := Automatica
 int nCarritos = 3;
 int maxProductos = 5; // 30
-int maxPesoBanda = 300; // 200
+int maxPesoBanda = 240; // 200
 float velCajera = 1.0;
 float velEmbolsador = 4;
 int tFacturacion = 130;
@@ -187,10 +187,20 @@ void simulacion(LinkedList *inventario){
 				agregarCola(banda, prodBanda);
 				pesoBanda = pesoBanda - prodBanda->peso;
 			}
+			else if (carritos[i]->cant > 0 && carritos[i]->head->prod->peso > pesoBanda && pesoBanda == maxPesoBanda){
+				prodBanda = eliminarElem(carritos[i]);
+				agregarCola(banda, prodBanda);
+				pesoBanda = 0;
+			}
 			//comprueba si el tiempo de procesamiento del primer objeto de la banda ya paso y cantinua con el siguiente objeto
 			if(complejidadAct <= 0 && !facturado){
 				prodPila = quitarCola(banda);
-				pesoBanda = pesoBanda + prodPila->peso;
+				if(prodPila->peso > maxPesoBanda){
+					pesoBanda = maxPesoBanda;
+				}
+				else{
+					pesoBanda = pesoBanda + prodPila->peso;
+				}
 				if(carritos[i]->cant == 0 && banda->cant == 0){
 					facturado = TRUE;
 				}
@@ -204,6 +214,11 @@ void simulacion(LinkedList *inventario){
 				prodBanda = eliminarElem(carritos[i]);
 				agregarCola(banda, prodBanda);
 				pesoBanda = pesoBanda - prodBanda->peso;
+			}
+			else if (carritos[i]->cant > 0 && carritos[i]->head->prod->peso > pesoBanda && pesoBanda == maxPesoBanda){
+				prodBanda = eliminarElem(carritos[i]);
+				agregarCola(banda, prodBanda);
+				pesoBanda = 0;
 			}
 
 			// Comprueba si hay productos en el AreaEmb y si ha pasado el tiempo de abrir una bolsa.
@@ -316,7 +331,7 @@ void menuConfiguracion(){
 	float aux1;
 	int auxEvaluador;
 	float auxEvaluador1;
-	bool config = true;
+	bool config = TRUE;
 
 	while (config){
 		printf("\n-----------------------------------------------\n");
