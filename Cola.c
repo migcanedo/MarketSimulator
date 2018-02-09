@@ -1,3 +1,13 @@
+//---------------------------------------------------------
+//  MARKET SIMULATOR
+//
+//  Fecha de elaboracion: 8/2/2018
+//
+//  Autores:
+//           Jose Donato Bracuto Delgado 13-10173
+//           Miguel Clemente Canedo Rodriguez 13-10214
+//---------------------------------------------------------
+
 #include <stdio.h>
 #include <stdlib.h>
 #include "mercado.h"

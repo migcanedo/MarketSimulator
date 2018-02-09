@@ -1,3 +1,13 @@
+//---------------------------------------------------------
+//  MARKET SIMULATOR
+//
+//  Fecha de elaboracion: 8/2/2018
+//
+//  Autores:
+//           Jose Donato Bracuto Delgado 13-10173
+//           Miguel Clemente Canedo Rodriguez 13-10214
+//---------------------------------------------------------
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
@@ -9,7 +19,7 @@ typedef int bool;
 
 int modalidad = 1; // 1 := Interactiva || 0 := Automatica
 int nCarritos = 3;
-int maxProductos = 30; 
+int maxProductos = 5; 
 int maxPesoBanda = 200; 
 float velCajera = 1.0;
 float velEmbolsador = 4;
@@ -169,7 +179,7 @@ void simulacion(LinkedList *inventario){
 			agregarCola(banda, prodBanda);
 			pesoBanda = pesoBanda - prodBanda->peso;
 		}
-		complejidadAct = prodBanda->complejidad;
+		complejidadAct = banda->head->prod->complejidad;
 		if(modalidad) imprimirDatos(carritos[i], banda, areaEmb, bolsas, bolsaAct);
 		++operacion;
 		int t = 0;
@@ -205,29 +215,28 @@ void simulacion(LinkedList *inventario){
 					pesoBanda = pesoBanda + prodPila->peso;
 				}
 				if(carritos[i]->cant == 0 && banda->cant == 0){
+					tCliente = operacion;
 					facturado = TRUE;
 				}
 				else{
 					if(banda->head == NULL){
-						
+						if(carritos[i]->cant > 0 && carritos[i]->head->prod->peso <= pesoBanda){
+							prodBanda = eliminarElem(carritos[i]);
+							agregarCola(banda, prodBanda);
+							pesoBanda = pesoBanda - prodBanda->peso;
+						}
+						else if (carritos[i]->cant > 0 && carritos[i]->head->prod->peso > pesoBanda && pesoBanda == maxPesoBanda){
+							prodBanda = eliminarElem(carritos[i]);
+							agregarCola(banda, prodBanda);
+							pesoBanda = 0;
+						}
 					}
-					else{
-						complejidadAct = banda->head->prod->complejidad - complejidadAct;
-					}
+					complejidadAct = banda->head->prod->complejidad - complejidadAct;
 				}
 				agregarPila(areaEmb, prodPila);
 			}
 			//comprueba si hay espacio en la banda y saca producto del carrito hacia la banda
-			if(carritos[i]->cant > 0 && carritos[i]->head->prod->peso <= pesoBanda){
-				prodBanda = eliminarElem(carritos[i]);
-				agregarCola(banda, prodBanda);
-				pesoBanda = pesoBanda - prodBanda->peso;
-			}
-			else if (carritos[i]->cant > 0 && carritos[i]->head->prod->peso > pesoBanda && pesoBanda == maxPesoBanda){
-				prodBanda = eliminarElem(carritos[i]);
-				agregarCola(banda, prodBanda);
-				pesoBanda = 0;
-			}
+			
 
 			// Comprueba si hay productos en el AreaEmb y si ha pasado el tiempo de abrir una bolsa.
 			if (areaEmb->cant > 0 && tiempoEmbolsadorAct >= velEmbolsador){
@@ -278,7 +287,7 @@ void simulacion(LinkedList *inventario){
 		// Aqui preguntamos si el tiempo de facturacion es mayor o igual al tiempo qu tomo terminar de vaciar el AreaEmb.
 		// En caso de q sea afirmativo se suma la diferencia de ambos, en caso contrario se suma solo el tiempo que tomo
 		// vaciar el AreaEmb.
-		tCliente = operacion + (tFacturacion >= tiempoVaciarAreaEmb ? tFacturacion - tiempoVaciarAreaEmb : tiempoVaciarAreaEmb);
+		tCliente += (tFacturacion >= tiempoVaciarAreaEmb ? tFacturacion : tiempoVaciarAreaEmb);
 		printf("\n\n============  CLIENTE NUMERO %d TARDO %dseg EN SER FACTURADO  ===========\n\n", i+1, tCliente);
 
 		fprintf(logfile, "Tiempo cliente numero %d: %d - ", i+1, tCliente);

@@ -2,5 +2,5 @@
 
 Realizado por:
 
-- Jose Bracuto
-- Miguel Canedo 
+- Jose Bracuto 13-10173
+- Miguel Canedo 13-10214
