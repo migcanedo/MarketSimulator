@@ -9,8 +9,8 @@ typedef int bool;
 
 int modalidad = 1; // 1 := Interactiva || 0 := Automatica
 int nCarritos = 3;
-int maxProductos = 5; // 30
-int maxPesoBanda = 240; // 200
+int maxProductos = 30; 
+int maxPesoBanda = 200; 
 float velCajera = 1.0;
 float velEmbolsador = 4;
 int tFacturacion = 130;
@@ -163,9 +163,11 @@ void simulacion(LinkedList *inventario){
 			printf("=================  INSTANTE %d  =================\n", operacion+1);
 		}
 
-		prodBanda = eliminarElem(carritos[i]);
-		agregarCola(banda, prodBanda);
-		pesoBanda = pesoBanda - prodBanda->peso;
+		while(carritos[i]->head->prod->peso <= pesoBanda){
+			prodBanda = eliminarElem(carritos[i]);
+			agregarCola(banda, prodBanda);
+			pesoBanda = pesoBanda - prodBanda->peso;
+		}
 		complejidadAct = prodBanda->complejidad;
 		if(modalidad) imprimirDatos(carritos[i], banda, areaEmb, bolsas, bolsaAct);
 		++operacion;
@@ -205,7 +207,12 @@ void simulacion(LinkedList *inventario){
 					facturado = TRUE;
 				}
 				else{
-					complejidadAct = banda->head->prod->complejidad - complejidadAct;
+					if(banda->head == NULL){
+						printf("ESTO ERAAAAAA\n");
+					}
+					else{
+						complejidadAct = banda->head->prod->complejidad - complejidadAct;
+					}
 				}
 				agregarPila(areaEmb, prodPila);
 			}

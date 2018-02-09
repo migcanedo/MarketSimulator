@@ -48,6 +48,7 @@ Producto *quitarCola(Cola *c) {
 		c->cant = c->cant - 1;
 		if(c->cant == 0){
 			c->tail = NULL;
+			c->head = NULL;
 		}
 	}
 	else {
