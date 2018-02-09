@@ -13,8 +13,6 @@
 #include <time.h>
 #include "mercado.h"
 
-typedef int bool;
-
 // Variables Globales
 
 int modalidad = 1; // 1 := Interactiva || 0 := Automatica
@@ -152,8 +150,8 @@ void simulacion(LinkedList *inventario){
 		}
 	}
 
-	fprintf(logfile, "Capacidad banda: %d - Velocidad cajera: %f - ", maxPesoBanda, velCajera);
-	fprintf(logfile, "Velocidad embolsador: %f - Tiempo de facturacion: %d - ", velEmbolsador, tFacturacion);
+	fprintf(logfile, "Capacidad banda: %d - Velocidad cajera: %.3f - ", maxPesoBanda, velCajera);
+	fprintf(logfile, "Velocidad embolsador: %.3f - Tiempo de facturacion: %d - ", velEmbolsador, tFacturacion);
 	fprintf(logfile, "Capacidad area de embolsado: %d - Capacidad de bolsa: %d - ",  maxPesoAreaEmbolsado, maxPesoBolsa);
 
 	printf("\n==================  INICIO DE SIMULACION  ==================\n");
@@ -348,7 +346,7 @@ void menuConfiguracion(){
 	float aux1;
 	int auxEvaluador;
 	float auxEvaluador1;
-	bool config = TRUE;
+	int config = TRUE;
 
 	while (config){
 		printf("\n-----------------------------------------------\n");
