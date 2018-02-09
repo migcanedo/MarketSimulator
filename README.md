@@ -7,8 +7,5 @@ Realizado por:
 
 ## Procedimiento para la ejecucion
 
-```
-make
-./mercado archivoInventario.txt
-```
+```make\t./mercado archivoInventario.txt```
 
