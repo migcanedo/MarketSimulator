@@ -82,5 +82,4 @@ void vaciarCola (Cola *c) {
 	while(c->cant > 0){
 		quitarCola(c);
 	}
-	free(c);
 }

@@ -95,7 +95,7 @@ utilizando la configuracion global del programa.
 void simulacion(LinkedList *inventario){
 
 	FILE *logfile = fopen ("ArchivoDeRegistro.log", "a");
-	fprintf(logfile, "Archivo: %s Cantidad carritos: %d ", nombreArch, nCarritos);
+	fprintf(logfile, "Archivo: %s - Cantidad carritos: %d - ", nombreArch, nCarritos);
 
 	srand(time(NULL));
 	
@@ -120,6 +120,7 @@ void simulacion(LinkedList *inventario){
 	int tTotal = 0; // Tiempo total de procesar a todos los clientes.
 
 	if (modalidad) printf("\n=========  CARRITOS CREADOS  =========\n");
+
 	int i, j, cantProd, p, ite;
 	for(i = 0; i < nCarritos; i++){
 		carritos[i] = crearLista();
@@ -136,14 +137,14 @@ void simulacion(LinkedList *inventario){
 		}
 		if(modalidad){
 			printf("\n======  CARRITO %d  ======\n", i+1);
-			fprintf(logfile, "Productos carrito %d: %d ", i+1, carritos[i]->cant);
+			fprintf(logfile, "Productos carrito %d: %d - ", i+1, carritos[i]->cant);
 			imprimirLista(carritos[i]);
 		}
 	}
 
-	fprintf(logfile, "Capacidad banda: %d Velocidad cajera: %f ", maxPesoBanda, velCajera);
-	fprintf(logfile, "Velocidad embolsador: %f Tiempo de facturacion: %d ", velEmbolsador, tFacturacion);
-	fprintf(logfile, "Capacidad area de embolsado: %d Capacidad de bolsa: %d ",  maxPesoAreaEmbolsado, maxPesoBolsa);
+	fprintf(logfile, "Capacidad banda: %d - Velocidad cajera: %f - ", maxPesoBanda, velCajera);
+	fprintf(logfile, "Velocidad embolsador: %f - Tiempo de facturacion: %d - ", velEmbolsador, tFacturacion);
+	fprintf(logfile, "Capacidad area de embolsado: %d - Capacidad de bolsa: %d - ",  maxPesoAreaEmbolsado, maxPesoBolsa);
 
 	printf("\n==================  INICIO DE SIMULACION  ==================\n");
 
@@ -163,7 +164,7 @@ void simulacion(LinkedList *inventario){
 			printf("=================  INSTANTE %d  =================\n", operacion+1);
 		}
 
-		while(carritos[i]->head->prod->peso <= pesoBanda){
+		while(carritos[i]->head && carritos[i]->head->prod->peso <= pesoBanda){
 			prodBanda = eliminarElem(carritos[i]);
 			agregarCola(banda, prodBanda);
 			pesoBanda = pesoBanda - prodBanda->peso;
@@ -208,7 +209,7 @@ void simulacion(LinkedList *inventario){
 				}
 				else{
 					if(banda->head == NULL){
-						printf("ESTO ERAAAAAA\n");
+						
 					}
 					else{
 						complejidadAct = banda->head->prod->complejidad - complejidadAct;
@@ -280,7 +281,7 @@ void simulacion(LinkedList *inventario){
 		tCliente = operacion + (tFacturacion >= tiempoVaciarAreaEmb ? tFacturacion - tiempoVaciarAreaEmb : tiempoVaciarAreaEmb);
 		printf("\n\n============  CLIENTE NUMERO %d TARDO %dseg EN SER FACTURADO  ===========\n\n", i+1, tCliente);
 
-		fprintf(logfile, "Tiempo cliente numero %d: %d ", i+1, tCliente);
+		fprintf(logfile, "Tiempo cliente numero %d: %d - ", i+1, tCliente);
 		tTotal += tCliente;
 
 		// Se reinician las variables, se elimina el carrito actual y se vacian las bolsas para volverlas a usar.
