@@ -1,4 +1,5 @@
 # MarketSimulator
+Asignación de la materia Sistemas de Operación 1 para familiarizarse con el lenguaje C.
 
 Realizado por:
 
